@@ -11,37 +11,36 @@ import timber.log.Timber
 
 class TMApplication : Application() {
 
-    companion object {
-        @JvmStatic
-        @SuppressLint("StaticFieldLeak")
-        lateinit var instance: TMApplication
-    }
+	companion object {
+		@JvmStatic
+		@SuppressLint("StaticFieldLeak")
+		lateinit var instance: TMApplication
+	}
 
-    lateinit var networkRepository: NetworkRepository
-    lateinit var categoriesRepository: CategoriesRepository
-    lateinit var listingsRepository: ListingsRepository
+	lateinit var networkRepository: NetworkRepository
+	lateinit var categoriesRepository: CategoriesRepository
+	lateinit var listingsRepository: ListingsRepository
 
-    override fun attachBaseContext(base: Context?) {
-        super.attachBaseContext(base)
-        instance = this
-    }
+	override fun attachBaseContext(base: Context?) {
+		super.attachBaseContext(base)
+		instance = this
+	}
 
-    override fun onCreate() {
-        super.onCreate()
+	override fun onCreate() {
+		super.onCreate()
 
-        // enable console logging for debug builds
-        if (BuildConfig.DEBUG) Timber.plant(Timber.DebugTree())
+		// enable console logging for debug builds
+		if (BuildConfig.DEBUG) Timber.plant(Timber.DebugTree())
 
-        initDependencies()
-    }
+		initDependencies()
+	}
 
-    private fun initDependencies() {
-        networkRepository = NetworkRepository()
+	private fun initDependencies() {
+		networkRepository = NetworkRepository()
 
-        categoriesRepository = CategoriesRepository(networkRepository)
-        listingsRepository = ListingsRepository(networkRepository)
-    }
-
+		categoriesRepository = CategoriesRepository(networkRepository)
+		listingsRepository = ListingsRepository(networkRepository)
+	}
 
 
 }
