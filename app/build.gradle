@@ -47,4 +47,8 @@ dependencies {
     // rx java adapter for retrofit
     // https://github.com/square/retrofit/tree/master/retrofit-adapters/rxjava2
     implementation "com.squareup.retrofit2:adapter-rxjava2:2.5.0"
+
+    // logging
+    // https://github.com/JakeWharton/timber
+    implementation 'com.jakewharton.timber:timber:4.7.1'
 }
