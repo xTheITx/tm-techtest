@@ -61,9 +61,10 @@ class CategoriesRepository(
 	 * or null if no Category with the number is found
 	 */
 	private fun getSubcategory(targetCategoryNumber: String, category: Category): Category? {
+		val nextSubcategoryNumber = getNextSubcategoryNumber(targetCategoryNumber, category.id)
+
 		val subcategories = category.subcategories ?: return null
 		subcategories.forEach { subcategory ->
-			val nextSubcategoryNumber = getNextSubcategoryNumber(targetCategoryNumber, category.id)
 
 			// check if we have reached the correct category depth
 			if (nextSubcategoryNumber == null) {
@@ -90,12 +91,14 @@ class CategoriesRepository(
 	 *
 	 * Eg given an categoryNumber of 1111-2222-3333 will return 1111-2222
 	 * If no subcategory Ids are found (separated by '-') then null is returned
-	 * // todo update documentation?
+	 * // todo update documentation and implemetation!
 	 */
 	private fun getNextSubcategoryNumber(categoryNumber: String, parentCategoryNumber: String): String? {
 		val index = categoryNumber.indexOf("-", parentCategoryNumber.length)
-		if (index == -1) return null
 
-		return categoryNumber.substring(index)
+		// if no separator was found, or the separator was the last character, then return null as no next subcategory number exists
+		if (index == -1 || index == categoryNumber.length - 1) return null
+
+		return categoryNumber.substring(index+1)
 	}
 }
