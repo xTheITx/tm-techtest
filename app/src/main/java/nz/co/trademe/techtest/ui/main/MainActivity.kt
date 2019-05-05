@@ -163,8 +163,7 @@ class MainActivity : AppCompatActivity(),
 					override fun onSuccess(category: Category) {
 						category.subcategories?.let {
 							categories.clear()
-							//categories.addAll(it)
-							categories.add(it[0])
+							categories.addAll(it)
 						}
 					}
 
