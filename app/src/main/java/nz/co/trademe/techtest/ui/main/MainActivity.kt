@@ -5,7 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
-import android.widget.ProgressBar
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -41,9 +41,12 @@ class MainActivity : AppCompatActivity(),
 
 	private val categories: MutableList<Category> = mutableListOf()
 	private lateinit var adapter: CategoryListAdapter
+	private var loadingMessageId: Int = -1
 
 	@BindView(R.id.loading_indicator)
-	lateinit var loadingIndicator: ProgressBar
+	lateinit var loadingIndicator: View
+	@BindView(R.id.message)
+	lateinit var loadingTextView: TextView
 	@BindView(R.id.recycler_view)
 	lateinit var recyclerView: RecyclerView
 
@@ -60,11 +63,16 @@ class MainActivity : AppCompatActivity(),
 			supportActionBar?.setDisplayHomeAsUpEnabled(true)
 		}
 
+		// intialize recyclerview and adapter
 		adapter = CategoryListAdapter(categories)
 		adapter.listener = this
 		recyclerView.layoutManager = LinearLayoutManager(this)
 		recyclerView.adapter = adapter
 
+		// initialize loading message
+		if (loadingMessageId == -1) loadingMessageId = (Math.random() * 6f).toInt()
+
+		// load category data
 		disposable = categoriesRepository.getCategory(categoryId)
 				.subscribeOn(Schedulers.io())
 				.observeOn(AndroidSchedulers.mainThread())
@@ -87,6 +95,8 @@ class MainActivity : AppCompatActivity(),
 						// todo error handling
 					}
 				})
+
+		updateView()
 	}
 
 	override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -103,7 +113,11 @@ class MainActivity : AppCompatActivity(),
 	 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 	private fun updateView() {
-		loadingIndicator.visibility = if (getLoadingIndicatorVisible()) View.VISIBLE else View.GONE
+		val loadingIndicatorVisible = getLoadingIndicatorVisible()
+		loadingIndicator.visibility = if (loadingIndicatorVisible) View.VISIBLE else View.GONE
+		if (loadingIndicatorVisible) {
+			loadingTextView.text = getLoadingText()
+		}
 
 		val contentVisible = getContentVisible()
 		recyclerView.visibility = if (contentVisible) View.VISIBLE else View.GONE
@@ -115,6 +129,18 @@ class MainActivity : AppCompatActivity(),
 	private fun getLoadingIndicatorVisible(): Boolean {
 		// show the loading indicator if the content hasn't loaded
 		return !getContentVisible()
+	}
+
+	private fun getLoadingText(): String {
+		return when(loadingMessageId) {
+			0 -> getString(R.string.loading_message_1)
+			1 -> getString(R.string.loading_message_2)
+			2 -> getString(R.string.loading_message_3)
+			3 -> getString(R.string.loading_message_4)
+			4 -> getString(R.string.loading_message_5)
+			5 -> getString(R.string.loading_message_6)
+			else -> getString(R.string.loading_message_7)
+		}
 	}
 
 	private fun getContentVisible(): Boolean {

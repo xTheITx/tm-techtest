@@ -11,9 +11,25 @@
 		android:layout_width="match_parent"
 		android:layout_height="match_parent" />
 
-	<ProgressBar
+	<LinearLayout
 		android:id="@+id/loading_indicator"
-		android:layout_width="wrap_content"
+		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:layout_gravity="center"/>
+		android:layout_gravity="center"
+		android:gravity="center"
+		android:orientation="vertical"
+		android:padding="@dimen/grid_2">
+
+		<ProgressBar
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content" />
+
+		<TextView
+			android:id="@+id/message"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="@dimen/grid_2"
+			android:gravity="center"
+			tools:text="Loading..." />
+	</LinearLayout>
 </FrameLayout>
