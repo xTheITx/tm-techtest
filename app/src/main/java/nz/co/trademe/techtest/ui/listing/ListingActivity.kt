@@ -18,6 +18,7 @@ import io.reactivex.schedulers.Schedulers
 import nz.co.trademe.techtest.R
 import nz.co.trademe.techtest.core.TMApplication
 import nz.co.trademe.techtest.domain.repository.ListingsRepository
+import nz.co.trademe.techtest.ui.util.ErrorDialogUtil
 import nz.co.trademe.wrapper.models.ListedItemDetail
 import timber.log.Timber
 
@@ -38,6 +39,7 @@ class ListingActivity : AppCompatActivity() {
 
 	private var disposable: DisposableSingleObserver<ListedItemDetail>? = null
 
+	private var listingId: Long = INVALID_LISTING_ID
 	private var listing: ListedItemDetail? = null
 
 	@BindView(R.id.loading_indicator)
@@ -61,30 +63,11 @@ class ListingActivity : AppCompatActivity() {
 		// display up navigation arrow
 		supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-		val listingId: Long = intent.getLongExtra(EXTRA_LISTING_ID, INVALID_LISTING_ID)
+		listingId = intent.getLongExtra(EXTRA_LISTING_ID, INVALID_LISTING_ID)
 		if (listingId == INVALID_LISTING_ID) throw IllegalArgumentException("Listing ID not provided in intent")
 
-		disposable = listingsRepository.getListingDetails(listingId)
-				.subscribeOn(Schedulers.io())
-				.observeOn(AndroidSchedulers.mainThread())
-				.doFinally {
-					// clear disposable reference, indicating that this operation has completed
-					disposable = null
-					// update view to reflect any changes
-					updateView()
-				}
-				.subscribeWith(object : DisposableSingleObserver<ListedItemDetail>() {
-					override fun onSuccess(listingResult: ListedItemDetail) {
-						listing = listingResult
-					}
-
-					override fun onError(e: Throwable) {
-						Timber.e(e)
-						// todo error handling
-					}
-				})
-
-		updateView()
+		// load data if it hasn't already been loaded
+		if (listing == null) loadListingData()
 	}
 
 	override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -144,5 +127,42 @@ class ListingActivity : AppCompatActivity() {
 
 	private fun getListingNumberText(): String? {
 		return getString(R.string.listing_number_, listing?.listingId)
+	}
+
+	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	 * data loading
+	 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+	private fun loadListingData() {
+		// ensure we have a valid listing id
+		if (listingId == INVALID_LISTING_ID) throw IllegalArgumentException("Listing ID not initialized")
+
+		// dispose any previously ongoing request
+		disposable?.dispose()
+
+		disposable = listingsRepository.getListingDetails(listingId)
+				.subscribeOn(Schedulers.io())
+				.observeOn(AndroidSchedulers.mainThread())
+				.doFinally {
+					// clear disposable reference, indicating that this operation has completed
+					disposable = null
+					// update view to reflect any changes
+					updateView()
+				}
+				.subscribeWith(object : DisposableSingleObserver<ListedItemDetail>() {
+					override fun onSuccess(listingResult: ListedItemDetail) {
+						listing = listingResult
+					}
+
+					override fun onError(e: Throwable) {
+						Timber.e(e)
+						ErrorDialogUtil.handleException(this@ListingActivity, e) {
+							// retry the request
+							loadListingData()
+						}
+					}
+				})
+
+		updateView()
 	}
 }

@@ -10,7 +10,9 @@ import androidx.recyclerview.widget.RecyclerView
 import butterknife.BindView
 import butterknife.ButterKnife
 import butterknife.OnClick
+import io.reactivex.Flowable
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.functions.BiFunction
 import io.reactivex.observers.DisposableSingleObserver
 import io.reactivex.schedulers.Schedulers
 import nz.co.trademe.techtest.R
@@ -20,6 +22,7 @@ import nz.co.trademe.techtest.ui.main.listings.ListingListAdapter
 import nz.co.trademe.wrapper.models.Category
 import nz.co.trademe.wrapper.models.SearchListing
 import timber.log.Timber
+import java.util.concurrent.TimeUnit
 
 class CategoryListAdapter(private val categories: List<Category>) :
 		RecyclerView.Adapter<CategoryListAdapter.MyViewHolder>(),
@@ -63,7 +66,10 @@ class CategoryListAdapter(private val categories: List<Category>) :
 
 	inner class MyViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
+
 		private val listingsRepository: ListingsRepository = TMApplication.instance.listingsRepository
+
+		private val retryLimit = 3
 
 		private lateinit var category: Category
 
@@ -97,6 +103,25 @@ class CategoryListAdapter(private val categories: List<Category>) :
 			disposable = listingsRepository.getTopCategoryListings(category.id)
 					.subscribeOn(Schedulers.io())
 					.observeOn(AndroidSchedulers.mainThread())
+					// implement basic exponential backoff retrying
+					// https://pamartinezandres.com/rxjava-2-exponential-backoff-retry-only-when-internet-is-available-5a46188ab175
+					.retryWhen { errors: Flowable<Throwable> ->
+						errors.zipWith(
+								Flowable.range(1, retryLimit + 1),
+								BiFunction<Throwable, Int, Int> { error: Throwable, retryCount: Int ->
+									if (retryCount > retryLimit) {
+										throw error
+									} else {
+										retryCount
+									}
+								}
+						).flatMap { retryCount: Int ->
+							Flowable.timer(
+									Math.pow(2.toDouble(), retryCount.toDouble()).toLong(), TimeUnit.SECONDS
+							)
+						}
+					}
+					// clean up once the operation is complete
 					.doFinally {
 						// clear disposable reference, indicating that this operation has completed
 						disposable = null
@@ -111,8 +136,11 @@ class CategoryListAdapter(private val categories: List<Category>) :
 						}
 
 						override fun onError(e: Throwable) {
+							// only report the error to get visibility on the issue
 							Timber.e(e)
-							// todo error handling
+
+							// We intentionally don't prompt the user here as the screen is still usable, and there isn't much else we
+							// can do at this stage as we have already retried the request
 						}
 					})
 

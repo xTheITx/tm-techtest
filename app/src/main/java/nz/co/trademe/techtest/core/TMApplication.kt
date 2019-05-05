@@ -30,6 +30,7 @@ class TMApplication : Application() {
 		super.onCreate()
 
 		// enable console logging for debug builds
+		// todo improve reporting of exceptions
 		if (BuildConfig.DEBUG) Timber.plant(Timber.DebugTree())
 
 		initDependencies()

@@ -1,5 +1,10 @@
 <resources>
-    <string name="app_name">Totally not TradeMe</string>
+    <!-- general -->
+    <string name="app_name">Totally not the Trade Me</string>
+
+    <string name="retry">Retry</string>
+    <string name="cancel">Cancel</string>
+
     <string name="loading_message_1">Have a nice day :)</string>
     <string name="loading_message_2">Your positive action combined with positive thinking results in success</string>
     <string name="loading_message_3">Live life to the fullest, and focus on the positive</string>
@@ -14,5 +19,9 @@
     <!-- listing -->
     <string name="listing_number_">Listing #: %s</string>
     <string name="cd_listing_image">Listing image</string>
+
+    <!-- error messages-->
+    <string name="network_error_message">An network error has occured, check your connection and try again</string>
+    <string name="unknown_error_message">An unknown error has occured, we have been informed of the issue</string>
 
 </resources>

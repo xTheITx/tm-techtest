@@ -19,8 +19,10 @@ import nz.co.trademe.techtest.core.TMApplication
 import nz.co.trademe.techtest.domain.repository.CategoriesRepository
 import nz.co.trademe.techtest.ui.listing.ListingActivity
 import nz.co.trademe.techtest.ui.main.categories.CategoryListAdapter
+import nz.co.trademe.techtest.ui.util.ErrorDialogUtil
 import nz.co.trademe.wrapper.models.Category
 import timber.log.Timber
+
 
 class MainActivity : AppCompatActivity(),
 		CategoryListAdapter.Listener {
@@ -39,6 +41,8 @@ class MainActivity : AppCompatActivity(),
 
 	private var disposable: DisposableSingleObserver<Category>? = null
 
+	private lateinit var categoryId: String
+
 	private val categories: MutableList<Category> = mutableListOf()
 	private lateinit var adapter: CategoryListAdapter
 	private var loadingMessageId: Int = -1
@@ -56,7 +60,7 @@ class MainActivity : AppCompatActivity(),
 
 		ButterKnife.bind(this)
 
-		val categoryId: String = intent.getStringExtra(EXTRA_CATEGORY_NUMBER) ?: CategoriesRepository.ROOT_CATEGORY
+		categoryId = intent.getStringExtra(EXTRA_CATEGORY_NUMBER) ?: CategoriesRepository.ROOT_CATEGORY
 
 		// show the back arrow if we're not at the root category
 		if (categoryId != CategoriesRepository.ROOT_CATEGORY) {
@@ -72,31 +76,8 @@ class MainActivity : AppCompatActivity(),
 		// initialize loading message
 		if (loadingMessageId == -1) loadingMessageId = (Math.random() * 6f).toInt()
 
-		// load category data
-		disposable = categoriesRepository.getCategory(categoryId)
-				.subscribeOn(Schedulers.io())
-				.observeOn(AndroidSchedulers.mainThread())
-				.doFinally {
-					// clear disposable reference, indicating that this operation has completed
-					disposable = null
-					// update view to reflect any changes
-					updateView()
-				}
-				.subscribeWith(object : DisposableSingleObserver<Category>() {
-					override fun onSuccess(category: Category) {
-						category.subcategories?.let {
-							categories.clear()
-							categories.addAll(it)
-						}
-					}
-
-					override fun onError(e: Throwable) {
-						Timber.e(e)
-						// todo error handling
-					}
-				})
-
-		updateView()
+		// load data if it hasn't already been loaded
+		if (categories.isEmpty()) loadCategoryData()
 	}
 
 	override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -132,7 +113,7 @@ class MainActivity : AppCompatActivity(),
 	}
 
 	private fun getLoadingText(): String {
-		return when(loadingMessageId) {
+		return when (loadingMessageId) {
 			0 -> getString(R.string.loading_message_1)
 			1 -> getString(R.string.loading_message_2)
 			2 -> getString(R.string.loading_message_3)
@@ -158,5 +139,44 @@ class MainActivity : AppCompatActivity(),
 
 	override fun onListingSelected(listingId: Long) {
 		startActivity(ListingActivity.getIntent(this, listingId))
+	}
+
+	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	 * data loading
+	 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+	private fun loadCategoryData() {
+		// dispose any previously ongoing request
+		disposable?.dispose()
+
+		// load category data
+		disposable = categoriesRepository.getCategory(categoryId)
+				.subscribeOn(Schedulers.io())
+				.observeOn(AndroidSchedulers.mainThread())
+				.doFinally {
+					// clear disposable reference, indicating that this operation has completed
+					disposable = null
+					// update view to reflect any changes
+					updateView()
+				}
+				.subscribeWith(object : DisposableSingleObserver<Category>() {
+					override fun onSuccess(category: Category) {
+						category.subcategories?.let {
+							categories.clear()
+							//categories.addAll(it)
+							categories.add(it[0])
+						}
+					}
+
+					override fun onError(e: Throwable) {
+						Timber.e(e)
+						ErrorDialogUtil.handleException(this@MainActivity, e) {
+							// retry the request
+							loadCategoryData()
+						}
+					}
+				})
+
+		updateView()
 	}
 }
