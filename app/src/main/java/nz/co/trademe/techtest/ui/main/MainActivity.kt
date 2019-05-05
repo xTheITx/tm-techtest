@@ -14,6 +14,7 @@ import io.reactivex.schedulers.Schedulers
 import nz.co.trademe.techtest.R
 import nz.co.trademe.techtest.core.TMApplication
 import nz.co.trademe.techtest.domain.repository.CategoriesRepository
+import nz.co.trademe.techtest.ui.main.categories.CategoryListAdapter
 import nz.co.trademe.wrapper.models.Category
 import timber.log.Timber
 
@@ -29,11 +30,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private var categoriesRepository: CategoriesRepository = TMApplication.instance.categoriesRepository
+    private val categoriesRepository: CategoriesRepository = TMApplication.instance.categoriesRepository
 
     private var disposable: DisposableSingleObserver<Category>? = null
 
-    private var categories: MutableList<Category> = mutableListOf()
+    private val categories: MutableList<Category> = mutableListOf()
     private lateinit var adapter: CategoryListAdapter
     @BindView(R.id.recycler_view)
     lateinit var recyclerView: RecyclerView
