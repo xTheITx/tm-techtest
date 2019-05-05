@@ -14,63 +14,64 @@ import nz.co.trademe.techtest.R
 import nz.co.trademe.wrapper.models.SearchListing
 
 class ListingListAdapter(private val listings: List<SearchListing>) :
-    RecyclerView.Adapter<ListingListAdapter.MyViewHolder>() {
+		RecyclerView.Adapter<ListingListAdapter.MyViewHolder>() {
 
-    var listener: Listener? = null
+	var listener: Listener? = null
 
-    interface Listener {
-        fun onListingSelected(listingId: Long)
-    }
+	interface Listener {
+		fun onListingSelected(listingId: Long)
+	}
 
-    // Create new views (invoked by the layout manager)
-    override fun onCreateViewHolder(
-        parent: ViewGroup,
-        viewType: Int
-    ): MyViewHolder {
-        // create a new view
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.row_listing, parent, false)
-        return MyViewHolder(view)
-    }
+	// Create new views (invoked by the layout manager)
+	override fun onCreateViewHolder(
+			parent: ViewGroup,
+			viewType: Int
+	): MyViewHolder {
+		// create a new view
+		val view = LayoutInflater.from(parent.context)
+				.inflate(R.layout.row_listing, parent, false)
+		return MyViewHolder(view)
+	}
 
-    override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        holder.updateView(listings[position])
-    }
+	override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
+		holder.updateView(listings[position])
+	}
 
-    override fun getItemCount() = listings.size
+	override fun getItemCount() = listings.size
 
-    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-     * view holder
-     * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	 * view holder
+	 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-    inner class MyViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+	inner class MyViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
-        private var listingId: Long = -1
+		private var listingId: Long = -1
 
-        @BindView(R.id.photo)
-        lateinit var photoImageView: ImageView
-        @BindView(R.id.heading)
-        lateinit var headingTextView: TextView
-        @BindView(R.id.price)
-        lateinit var priceTextView: TextView
+		@BindView(R.id.photo)
+		lateinit var photoImageView: ImageView
+		@BindView(R.id.heading)
+		lateinit var headingTextView: TextView
+		@BindView(R.id.price)
+		lateinit var priceTextView: TextView
 
-        init {
-            ButterKnife.bind(this, view)
-        }
+		init {
+			ButterKnife.bind(this, view)
+		}
 
-        fun updateView(listing: SearchListing) {
-            listingId = listing.listingId
+		fun updateView(listing: SearchListing) {
+			listingId = listing.listingId
 
-            Glide.with(photoImageView.context)
-                .load(listing.pictureHref)
-                .placeholder(R.drawable.ic_listing_default)
-                .into(photoImageView)
-            headingTextView.text = listing.title
-            priceTextView.text = listing.priceDisplay
-        }
+			Glide.with(photoImageView.context)
+					.load(listing.pictureHref)
+					.centerCrop()
+					.placeholder(R.drawable.ic_listing_default)
+					.into(photoImageView)
+			headingTextView.text = listing.title
+			priceTextView.text = listing.priceDisplay
+		}
 
-        @OnClick(R.id.touch_target) fun onListingSelected() {
-            listener?.onListingSelected(listingId)
-        }
-    }
+		@OnClick(R.id.touch_target) fun onListingSelected() {
+			listener?.onListingSelected(listingId)
+		}
+	}
 }

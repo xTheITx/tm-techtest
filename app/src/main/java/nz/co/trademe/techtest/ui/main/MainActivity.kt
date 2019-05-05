@@ -78,7 +78,7 @@ class MainActivity : AppCompatActivity(),
 	 * update view
 	 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-    fun updateView() {
+    private fun updateView() {
         // todo loading indicator
         adapter.notifyDataSetChanged()
     }
