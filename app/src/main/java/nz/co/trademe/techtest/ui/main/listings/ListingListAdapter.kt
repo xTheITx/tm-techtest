@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import butterknife.BindView
 import butterknife.ButterKnife
+import butterknife.OnClick
 import com.bumptech.glide.Glide
 import nz.co.trademe.techtest.R
 import nz.co.trademe.wrapper.models.SearchListing
@@ -15,9 +16,10 @@ import nz.co.trademe.wrapper.models.SearchListing
 class ListingListAdapter(private val listings: List<SearchListing>) :
     RecyclerView.Adapter<ListingListAdapter.MyViewHolder>() {
 
+    var listener: Listener? = null
+
     interface Listener {
-        fun onCategorySelected(categoryId: Int)
-        fun onListingSelected(listingId: Int)
+        fun onListingSelected(listingId: Long)
     }
 
     // Create new views (invoked by the layout manager)
@@ -41,7 +43,9 @@ class ListingListAdapter(private val listings: List<SearchListing>) :
      * view holder
      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-    class MyViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    inner class MyViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+
+        private var listingId: Long = -1
 
         @BindView(R.id.photo)
         lateinit var photoImageView: ImageView
@@ -55,12 +59,18 @@ class ListingListAdapter(private val listings: List<SearchListing>) :
         }
 
         fun updateView(listing: SearchListing) {
+            listingId = listing.listingId
+
             Glide.with(photoImageView.context)
                 .load(listing.pictureHref)
                 .placeholder(R.drawable.ic_listing_default)
                 .into(photoImageView)
             headingTextView.text = listing.title
             priceTextView.text = listing.priceDisplay
+        }
+
+        @OnClick(R.id.touch_target) fun onListingSelected() {
+            listener?.onListingSelected(listingId)
         }
     }
 }

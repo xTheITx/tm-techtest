@@ -18,7 +18,8 @@ import nz.co.trademe.techtest.ui.main.categories.CategoryListAdapter
 import nz.co.trademe.wrapper.models.Category
 import timber.log.Timber
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(),
+        CategoryListAdapter.Listener {
 
     companion object {
         private const val EXTRA_CATEGORY_ID = "extra_category_id"
@@ -45,9 +46,10 @@ class MainActivity : AppCompatActivity() {
 
         ButterKnife.bind(this)
 
-        var categoryId: String = intent.getStringExtra(EXTRA_CATEGORY_ID) ?: CategoriesRepository.ROOT_CATEGORY
+        val categoryId: String = intent.getStringExtra(EXTRA_CATEGORY_ID) ?: CategoriesRepository.ROOT_CATEGORY
 
         adapter = CategoryListAdapter(categories)
+        adapter.listener = this
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
 
@@ -71,8 +73,24 @@ class MainActivity : AppCompatActivity() {
             })
     }
 
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	 * update view
+	 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
     fun updateView() {
         // todo loading indicator
         adapter.notifyDataSetChanged()
+    }
+
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	 * adapter callbacks
+	 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+    override fun onCategorySelected(categoryId: String) {
+        startActivity(getIntent(this, categoryId))
+    }
+
+    override fun onListingSelected(listingId: Long) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }

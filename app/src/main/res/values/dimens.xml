@@ -46,7 +46,9 @@
     <dimen name="grid_30">240dp</dimen>
 
     <!-- UI dimensions -->
-    <dimen name="preview_height">90dp</dimen>
-    <dimen name="preview_width">160dp</dimen>
+    <dimen name="preview_listing_width">160dp</dimen>
+    <!-- todo insead of a fixed height, calculate the height based on runtime content height -->
+    <dimen name="preview_listing_height">168dp</dimen>
+    <dimen name="preview_listing_image_height">90dp</dimen>
 
 </resources>

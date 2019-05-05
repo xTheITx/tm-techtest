@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">techtest</string>
+
+    <string name="cd_listing_image_preview">Listing image preview</string>
 </resources>
