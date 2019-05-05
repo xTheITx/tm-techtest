@@ -3,6 +3,7 @@ package nz.co.trademe.techtest.ui.listing
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
 import android.widget.ProgressBar
@@ -57,6 +58,9 @@ class ListingActivity : AppCompatActivity() {
 
 		ButterKnife.bind(this)
 
+		// display up navigation arrow
+		supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
 		val listingId: Long = intent.getLongExtra(EXTRA_LISTING_ID, INVALID_LISTING_ID)
 		if (listingId == INVALID_LISTING_ID) throw IllegalArgumentException("Listing ID not provided in intent")
 
@@ -81,6 +85,15 @@ class ListingActivity : AppCompatActivity() {
 				})
 
 		updateView()
+	}
+
+	override fun onOptionsItemSelected(item: MenuItem): Boolean {
+		if (item.itemId == android.R.id.home) {
+			onBackPressed()
+			return true
+		}
+
+		return super.onOptionsItemSelected(item)
 	}
 
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

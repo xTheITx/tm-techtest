@@ -3,6 +3,7 @@ package nz.co.trademe.techtest.ui.main
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.view.MenuItem
 import android.view.View
 import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
@@ -54,6 +55,11 @@ class MainActivity : AppCompatActivity(),
 
 		val categoryId: String = intent.getStringExtra(EXTRA_CATEGORY_NUMBER) ?: CategoriesRepository.ROOT_CATEGORY
 
+		// show the back arrow if we're not at the root category
+		if (categoryId != CategoriesRepository.ROOT_CATEGORY) {
+			supportActionBar?.setDisplayHomeAsUpEnabled(true)
+		}
+
 		adapter = CategoryListAdapter(categories)
 		adapter.listener = this
 		recyclerView.layoutManager = LinearLayoutManager(this)
@@ -81,6 +87,15 @@ class MainActivity : AppCompatActivity(),
 						// todo error handling
 					}
 				})
+	}
+
+	override fun onOptionsItemSelected(item: MenuItem): Boolean {
+		if (item.itemId == android.R.id.home) {
+			onBackPressed()
+			return true
+		}
+
+		return super.onOptionsItemSelected(item)
 	}
 
 	/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
