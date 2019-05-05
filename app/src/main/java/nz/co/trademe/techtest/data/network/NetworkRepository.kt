@@ -7,10 +7,8 @@ import nz.co.trademe.wrapper.models.Category
 import nz.co.trademe.wrapper.models.ListedItemDetail
 import nz.co.trademe.wrapper.models.SearchCollection
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
-import retrofit2.http.Path
-import retrofit2.http.QueryMap
 
-class NetworkRepository() {
+class NetworkRepository {
 
     private val service: TradeMeApiService = TradeMeApi(RxJava2CallAdapterFactory.create()).get()
 
@@ -25,7 +23,7 @@ class NetworkRepository() {
      * cameras). Use the return_metadata parameter in combination with the category parameter to
      * retrieve information about the available parameters.
      */
-    fun generalSearch(@QueryMap filters: Map<String, String>): Single<SearchCollection> {
+    fun generalSearch(filters: Map<String, String>): Single<SearchCollection> {
         // todo refactor Map into concrete SearchQuery type with well defined enums/constants
         return service.generalSearch(filters)
     }
@@ -35,14 +33,14 @@ class NetworkRepository() {
      *
      * Retrieves all or part of the Trade Me category tree.
      */
-    fun getCategory(@Path("number") number: String): Single<Category> {
+    fun getCategory(number: String): Single<Category> {
         return service.getCategory(number)
     }
 
     /**
      * Retrieve the details of a single listing
      */
-    fun getListing(@Path("listingId") listingId: Long): Single<ListedItemDetail> {
+    fun getListing(listingId: Long): Single<ListedItemDetail> {
         return service.getListing(listingId)
     }
 
