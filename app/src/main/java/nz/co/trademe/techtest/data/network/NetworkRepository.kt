@@ -29,6 +29,23 @@ class NetworkRepository {
     }
 
     /**
+     * Retrieve the top listings [SearchCollection] for the provided [categoryNumber]
+     *
+     * This is a paged request, starting at page 0
+     */
+    fun getTopCategoryListings(categoryNumber: String, page: Int): Single<SearchCollection> {
+        // todo refactor Map into concrete SearchQuery type with well defined enums/constants
+        val filters = hashMapOf(
+            "category" to categoryNumber,
+            "page" to page.toString(),
+            "rows" to "5", // todo update to 20
+            "sort_order" to "Default"
+        )
+
+        return service.generalSearch(filters)
+    }
+
+    /**
      * Retrieve general categories
      *
      * Retrieves all or part of the Trade Me category tree.
