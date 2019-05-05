@@ -20,7 +20,7 @@
 			app:layout_constraintEnd_toEndOf="parent"
 			app:layout_constraintStart_toStartOf="parent"
 			app:layout_constraintTop_toTopOf="parent"
-			app:srcCompat="@drawable/ic_listing_default" />
+			tools:srcCompat="@drawable/ic_listing_default" />
 
 		<TextView
 			android:id="@+id/heading"
