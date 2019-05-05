@@ -24,6 +24,7 @@
 
 		<TextView
 			android:id="@+id/heading"
+			style="@style/Base.TextAppearance.AppCompat.Body1"
 			android:layout_width="0dp"
 			android:layout_height="wrap_content"
 			android:layout_marginStart="@dimen/grid_1"
