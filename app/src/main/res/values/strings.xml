@@ -1,5 +1,11 @@
 <resources>
-    <string name="app_name">techtest</string>
+    <string name="app_name">Totally not TradeMe</string>
 
+    <!-- category listing preview -->
     <string name="cd_listing_image_preview">Listing image preview</string>
+
+    <!-- listing -->
+    <string name="listing_number_">Listing #: %s</string>
+    <string name="cd_listing_image">Listing image</string>
+
 </resources>

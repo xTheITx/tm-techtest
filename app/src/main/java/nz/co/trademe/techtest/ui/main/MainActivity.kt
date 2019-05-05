@@ -14,6 +14,7 @@ import io.reactivex.schedulers.Schedulers
 import nz.co.trademe.techtest.R
 import nz.co.trademe.techtest.core.TMApplication
 import nz.co.trademe.techtest.domain.repository.CategoriesRepository
+import nz.co.trademe.techtest.ui.listing.ListingActivity
 import nz.co.trademe.techtest.ui.main.categories.CategoryListAdapter
 import nz.co.trademe.wrapper.models.Category
 import timber.log.Timber
@@ -22,11 +23,11 @@ class MainActivity : AppCompatActivity(),
         CategoryListAdapter.Listener {
 
     companion object {
-        private const val EXTRA_CATEGORY_ID = "extra_category_id"
+        private const val EXTRA_CATEGORY_NUMBER = "extra_category_number"
 
-        fun getIntent(activity: Activity, categoryId: String): Intent {
+        fun getIntent(activity: Activity, categoryNumber: String): Intent {
             val intent = Intent(activity, MainActivity::class.java)
-            intent.putExtra(EXTRA_CATEGORY_ID, categoryId)
+            intent.putExtra(EXTRA_CATEGORY_NUMBER, categoryNumber)
             return intent
         }
     }
@@ -46,7 +47,7 @@ class MainActivity : AppCompatActivity(),
 
         ButterKnife.bind(this)
 
-        val categoryId: String = intent.getStringExtra(EXTRA_CATEGORY_ID) ?: CategoriesRepository.ROOT_CATEGORY
+        val categoryId: String = intent.getStringExtra(EXTRA_CATEGORY_NUMBER) ?: CategoriesRepository.ROOT_CATEGORY
 
         adapter = CategoryListAdapter(categories)
         adapter.listener = this
@@ -91,6 +92,6 @@ class MainActivity : AppCompatActivity(),
     }
 
     override fun onListingSelected(listingId: Long) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        startActivity(ListingActivity.getIntent(this, listingId))
     }
 }

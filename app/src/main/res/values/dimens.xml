@@ -51,4 +51,6 @@
     <dimen name="preview_listing_height">168dp</dimen>
     <dimen name="preview_listing_image_height">90dp</dimen>
 
+    <dimen name="listing_image_height">240dp</dimen>
+
 </resources>
