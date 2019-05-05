@@ -14,9 +14,17 @@
 		android:padding="@dimen/grid_2"
 		tools:text="Listing heading" />
 
+	<!-- hardcode height so the layout doesn't change height while the listings are loading -->
 	<androidx.recyclerview.widget.RecyclerView
 		android:id="@+id/listings_recycler_view"
 		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
+		android:layout_height="@dimen/preview_listing_height"
 		android:orientation="horizontal" />
+
+	<!-- hardcode height so the layout doesn't change height while the listings are loading -->
+	<ProgressBar
+		android:id="@+id/loading_indicator"
+		android:layout_width="wrap_content"
+		android:layout_height="@dimen/preview_listing_height"
+		android:layout_gravity="center" />
 </LinearLayout>

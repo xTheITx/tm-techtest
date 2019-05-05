@@ -3,6 +3,7 @@ package nz.co.trademe.techtest.ui.main.categories
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -43,7 +44,7 @@ class CategoryListAdapter(private val categories: List<Category>) :
 	}
 
 	override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-		holder.updateView(categories[position])
+		holder.bind(categories[position])
 	}
 
 	override fun getItemCount() = categories.size
@@ -64,13 +65,15 @@ class CategoryListAdapter(private val categories: List<Category>) :
 
 		private val listingsRepository: ListingsRepository = TMApplication.instance.listingsRepository
 
-		private lateinit var categoryNumber: String
+		private lateinit var category: Category
 
 		private val listings: MutableList<SearchListing> = mutableListOf()
 		private val adapter: ListingListAdapter
 
 		private var disposable: DisposableSingleObserver<List<SearchListing>>? = null
 
+		@BindView(R.id.loading_indicator)
+		lateinit var loadingIndicator: ProgressBar
 		@BindView(R.id.heading)
 		lateinit var headingTextView: TextView
 		@BindView(R.id.listings_recycler_view)
@@ -85,14 +88,21 @@ class CategoryListAdapter(private val categories: List<Category>) :
 			listingRecyclerView.adapter = adapter
 		}
 
-		fun updateView(category: Category) {
-			categoryNumber = category.id
+		fun bind(category: Category) {
+			this.category = category
 
-			headingTextView.text = category.name
+			// dispose any previously ongoing request
+			disposable?.dispose()
 
 			disposable = listingsRepository.getTopCategoryListings(category.id)
 					.subscribeOn(Schedulers.io())
 					.observeOn(AndroidSchedulers.mainThread())
+					.doFinally {
+						// clear disposable reference, indicating that this operation has completed
+						disposable = null
+						// update view to reflect any changes
+						updateView()
+					}
 					.subscribeWith(object : DisposableSingleObserver<List<SearchListing>>() {
 						override fun onSuccess(topListings: List<SearchListing>) {
 							listings.clear()
@@ -106,11 +116,40 @@ class CategoryListAdapter(private val categories: List<Category>) :
 						}
 					})
 
-			// todo show listings loading indicator
+			updateView()
 		}
 
+		/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		 * update view
+		 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+		private fun updateView() {
+			headingTextView.text = getCategoryName()
+
+			loadingIndicator.visibility = if (getLoadingIndicatorVisible()) View.VISIBLE else View.GONE
+			listingRecyclerView.visibility = if (getListingsVisible()) View.VISIBLE else View.GONE
+		}
+
+		private fun getCategoryName(): String {
+			return category.name
+		}
+
+		private fun getLoadingIndicatorVisible(): Boolean {
+			// show the loading indicator if the content hasn't loaded
+			return !getListingsVisible()
+		}
+
+		private fun getListingsVisible(): Boolean {
+			// only show the listings if they have loaded
+			return disposable == null
+		}
+
+		/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		 * ui listeners
+		 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
 		@OnClick(R.id.heading) fun onCategorySelected() {
-			listener?.onCategorySelected(categoryNumber)
+			listener?.onCategorySelected(category.id)
 		}
 	}
 }
