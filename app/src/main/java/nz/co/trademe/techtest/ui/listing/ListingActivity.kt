@@ -114,7 +114,9 @@ class ListingActivity : AppCompatActivity() {
 	}
 
 	private fun getPhotoUrl(): String? {
-		return listing?.photos?.get(0)?.value?.large
+		val photos = listing?.photos
+		if (photos != null && photos.isEmpty()) return null
+		return photos?.get(0)?.value?.large
 	}
 
 	private fun getTitleText(): String? {
