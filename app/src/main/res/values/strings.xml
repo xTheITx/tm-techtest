@@ -1,6 +1,6 @@
 <resources>
     <!-- general -->
-    <string name="app_name">Totally not the Trade Me</string>
+    <string name="app_name">Totally not the Trade Me app</string>
 
     <string name="retry">Retry</string>
     <string name="cancel">Cancel</string>
