@@ -183,7 +183,8 @@ class CategoryListAdapter(private val categories: List<Category>) :
 		 * ui listeners
 		 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-		@OnClick(R.id.heading) fun onCategorySelected() {
+		@OnClick(R.id.heading)
+		fun onCategorySelected() {
 			listener?.onCategorySelected(category.id)
 		}
 	}

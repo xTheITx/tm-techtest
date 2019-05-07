@@ -176,7 +176,8 @@ class MainActivity : AppCompatActivity(),
 									// back out of the screen if the user cancels as the screen is unusable
 									onBackPressed()
 								},
-								onRetry = {// retry the request
+								onRetry = {
+									// retry the request
 									loadCategoryData()
 								})
 					}

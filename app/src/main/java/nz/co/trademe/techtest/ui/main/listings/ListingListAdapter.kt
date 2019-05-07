@@ -70,7 +70,8 @@ class ListingListAdapter(private val listings: List<SearchListing>) :
 			priceTextView.text = listing.priceDisplay
 		}
 
-		@OnClick(R.id.touch_target) fun onListingSelected() {
+		@OnClick(R.id.touch_target)
+		fun onListingSelected() {
 			listener?.onListingSelected(listingId)
 		}
 	}

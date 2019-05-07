@@ -42,6 +42,4 @@ class TMApplication : Application() {
 		categoriesRepository = CategoriesRepository(networkRepository)
 		listingsRepository = ListingsRepository(networkRepository)
 	}
-
-
 }
