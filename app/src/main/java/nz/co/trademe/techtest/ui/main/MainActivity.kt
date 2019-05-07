@@ -169,10 +169,16 @@ class MainActivity : AppCompatActivity(),
 
 					override fun onError(e: Throwable) {
 						Timber.e(e)
-						ErrorDialogUtil.handleException(this@MainActivity, e) {
-							// retry the request
-							loadCategoryData()
-						}
+						ErrorDialogUtil.handleException(
+								this@MainActivity,
+								e,
+								onCancel = {
+									// back out of the screen if the user cancels as the screen is unusable
+									onBackPressed()
+								},
+								onRetry = {// retry the request
+									loadCategoryData()
+								})
 					}
 				})
 

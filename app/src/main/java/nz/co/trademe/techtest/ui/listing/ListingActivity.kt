@@ -158,10 +158,17 @@ class ListingActivity : AppCompatActivity() {
 
 					override fun onError(e: Throwable) {
 						Timber.e(e)
-						ErrorDialogUtil.handleException(this@ListingActivity, e) {
-							// retry the request
-							loadListingData()
-						}
+						ErrorDialogUtil.handleException(
+								this@ListingActivity,
+								e,
+								onCancel = {
+									// back out of the screen if the user cancels as the screen is unusable
+									onBackPressed()
+								},
+								onRetry = {
+									// retry the request
+									loadListingData()
+								})
 					}
 				})
 
