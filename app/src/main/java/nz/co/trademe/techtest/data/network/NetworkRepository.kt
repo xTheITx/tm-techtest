@@ -8,7 +8,7 @@ import nz.co.trademe.wrapper.models.ListedItemDetail
 import nz.co.trademe.wrapper.models.SearchCollection
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 
-class NetworkRepository {
+open class NetworkRepository {
 
     private val service: TradeMeApiService = TradeMeApi(RxJava2CallAdapterFactory.create()).get()
 
