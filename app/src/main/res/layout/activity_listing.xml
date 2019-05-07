@@ -4,7 +4,7 @@
 	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
-	tools:context=".ui.main.ListingActivity">
+	tools:context=".ui.listing.ListingActivity">
 
 	<ImageView
 		android:id="@+id/photo"
