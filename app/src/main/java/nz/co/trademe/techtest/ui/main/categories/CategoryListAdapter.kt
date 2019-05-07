@@ -152,10 +152,17 @@ class CategoryListAdapter(private val categories: List<Category>) :
 		 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 		private fun updateView() {
+			// disable touch events for leaf categories to prevent navigation
+			headingTextView.isEnabled = getHasSubcategories()
+
 			headingTextView.text = getCategoryName()
 
 			loadingIndicator.visibility = if (getLoadingIndicatorVisible()) View.VISIBLE else View.GONE
 			listingRecyclerView.visibility = if (getListingsVisible()) View.VISIBLE else View.GONE
+		}
+
+		private fun getHasSubcategories(): Boolean {
+			return !category.isLeaf
 		}
 
 		private fun getCategoryName(): String {
