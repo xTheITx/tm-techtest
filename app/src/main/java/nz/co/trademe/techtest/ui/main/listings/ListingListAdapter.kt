@@ -1,16 +1,11 @@
 package nz.co.trademe.techtest.ui.main.listings
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import butterknife.BindView
-import butterknife.ButterKnife
-import butterknife.OnClick
 import com.bumptech.glide.Glide
 import nz.co.trademe.techtest.R
+import nz.co.trademe.techtest.databinding.RowListingBinding
 import nz.co.trademe.wrapper.models.SearchListing
 
 class ListingListAdapter(private val listings: List<SearchListing>) :
@@ -28,9 +23,9 @@ class ListingListAdapter(private val listings: List<SearchListing>) :
 			viewType: Int
 	): MyViewHolder {
 		// create a new view
-		val view = LayoutInflater.from(parent.context)
-				.inflate(R.layout.row_listing, parent, false)
-		return MyViewHolder(view)
+		val binding = RowListingBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+
+		return MyViewHolder(binding)
 	}
 
 	override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
@@ -43,36 +38,26 @@ class ListingListAdapter(private val listings: List<SearchListing>) :
 	 * view holder
 	 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-	inner class MyViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+	inner class MyViewHolder(private val binding: RowListingBinding) : RecyclerView.ViewHolder(binding.root) {
 
 		private var listingId: Long = -1
 
-		@BindView(R.id.photo)
-		lateinit var photoImageView: ImageView
-		@BindView(R.id.heading)
-		lateinit var headingTextView: TextView
-		@BindView(R.id.price)
-		lateinit var priceTextView: TextView
-
 		init {
-			ButterKnife.bind(this, view)
+			binding.touchTarget.setOnClickListener {
+				listener?.onListingSelected(listingId)
+			}
 		}
 
 		fun updateView(listing: SearchListing) {
 			listingId = listing.listingId
 
-			Glide.with(photoImageView.context)
+			Glide.with(binding.photo.context)
 					.load(listing.pictureHref)
 					.centerCrop()
 					.placeholder(R.drawable.ic_listing_default)
-					.into(photoImageView)
-			headingTextView.text = listing.title
-			priceTextView.text = listing.priceDisplay
-		}
-
-		@OnClick(R.id.touch_target)
-		fun onListingSelected() {
-			listener?.onListingSelected(listingId)
+					.into(binding.photo)
+			binding.heading.text = listing.title
+			binding.price.text = listing.priceDisplay
 		}
 	}
 }

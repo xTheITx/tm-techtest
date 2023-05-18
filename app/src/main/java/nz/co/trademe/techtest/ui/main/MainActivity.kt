@@ -5,17 +5,14 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import butterknife.BindView
-import butterknife.ButterKnife
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.observers.DisposableSingleObserver
 import io.reactivex.schedulers.Schedulers
 import nz.co.trademe.techtest.R
 import nz.co.trademe.techtest.core.TMApplication
+import nz.co.trademe.techtest.databinding.ActivityMainBinding
 import nz.co.trademe.techtest.domain.repository.CategoriesRepository
 import nz.co.trademe.techtest.ui.listing.ListingActivity
 import nz.co.trademe.techtest.ui.main.categories.CategoryListAdapter
@@ -47,18 +44,13 @@ class MainActivity : AppCompatActivity(),
 	private lateinit var adapter: CategoryListAdapter
 	private var loadingMessageId: Int = -1
 
-	@BindView(R.id.loading_indicator)
-	lateinit var loadingIndicator: View
-	@BindView(R.id.message)
-	lateinit var loadingTextView: TextView
-	@BindView(R.id.recycler_view)
-	lateinit var recyclerView: RecyclerView
+	private lateinit var binding: ActivityMainBinding
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		setContentView(R.layout.activity_main)
 
-		ButterKnife.bind(this)
+		binding = ActivityMainBinding.inflate(layoutInflater)
+		setContentView(binding.root)
 
 		categoryId = intent.getStringExtra(EXTRA_CATEGORY_NUMBER) ?: CategoriesRepository.ROOT_CATEGORY
 
@@ -70,8 +62,8 @@ class MainActivity : AppCompatActivity(),
 		// intialize recyclerview and adapter
 		adapter = CategoryListAdapter(categories)
 		adapter.listener = this
-		recyclerView.layoutManager = LinearLayoutManager(this)
-		recyclerView.adapter = adapter
+		binding.recyclerView.layoutManager = LinearLayoutManager(this)
+		binding.recyclerView.adapter = adapter
 
 		// initialize loading message
 		if (loadingMessageId == -1) loadingMessageId = (Math.random() * 6f).toInt()
@@ -82,7 +74,7 @@ class MainActivity : AppCompatActivity(),
 
 	override fun onOptionsItemSelected(item: MenuItem): Boolean {
 		if (item.itemId == android.R.id.home) {
-			onBackPressed()
+			onBackPressedDispatcher.onBackPressed()
 			return true
 		}
 
@@ -95,13 +87,13 @@ class MainActivity : AppCompatActivity(),
 
 	private fun updateView() {
 		val loadingIndicatorVisible = getLoadingIndicatorVisible()
-		loadingIndicator.visibility = if (loadingIndicatorVisible) View.VISIBLE else View.GONE
+		binding.loadingIndicator.visibility = if (loadingIndicatorVisible) View.VISIBLE else View.GONE
 		if (loadingIndicatorVisible) {
-			loadingTextView.text = getLoadingText()
+			binding.message.text = getLoadingText()
 		}
 
 		val contentVisible = getContentVisible()
-		recyclerView.visibility = if (contentVisible) View.VISIBLE else View.GONE
+		binding.recyclerView.visibility = if (contentVisible) View.VISIBLE else View.GONE
 		if (contentVisible) {
 			adapter.notifyDataSetChanged()
 		}
@@ -174,7 +166,7 @@ class MainActivity : AppCompatActivity(),
 								e,
 								onCancel = {
 									// back out of the screen if the user cancels as the screen is unusable
-									onBackPressed()
+									onBackPressedDispatcher.onBackPressed()
 								},
 								onRetry = {
 									// retry the request

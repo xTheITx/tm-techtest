@@ -3,20 +3,15 @@ package nz.co.trademe.techtest.ui.main.categories
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ProgressBar
-import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import butterknife.BindView
-import butterknife.ButterKnife
-import butterknife.OnClick
 import io.reactivex.Flowable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.functions.BiFunction
 import io.reactivex.observers.DisposableSingleObserver
 import io.reactivex.schedulers.Schedulers
-import nz.co.trademe.techtest.R
 import nz.co.trademe.techtest.core.TMApplication
+import nz.co.trademe.techtest.databinding.RowCategoryListingsBinding
 import nz.co.trademe.techtest.domain.repository.ListingsRepository
 import nz.co.trademe.techtest.ui.main.listings.ListingListAdapter
 import nz.co.trademe.wrapper.models.Category
@@ -41,9 +36,9 @@ class CategoryListAdapter(private val categories: List<Category>) :
 			viewType: Int
 	): MyViewHolder {
 		// create a new view
-		val view = LayoutInflater.from(parent.context)
-				.inflate(R.layout.row_category_listings, parent, false)
-		return MyViewHolder(view)
+		val binding = RowCategoryListingsBinding.inflate(
+			LayoutInflater.from(parent.context), parent, false)
+		return MyViewHolder(binding)
 	}
 
 	override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
@@ -64,7 +59,7 @@ class CategoryListAdapter(private val categories: List<Category>) :
 	 * view holder
 	 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-	inner class MyViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+	inner class MyViewHolder(private val binding: RowCategoryListingsBinding) : RecyclerView.ViewHolder(binding.root) {
 
 
 		private val listingsRepository: ListingsRepository = TMApplication.instance.listingsRepository
@@ -74,24 +69,18 @@ class CategoryListAdapter(private val categories: List<Category>) :
 		private lateinit var category: Category
 
 		private val listings: MutableList<SearchListing> = mutableListOf()
-		private val adapter: ListingListAdapter
+		private val adapter: ListingListAdapter = ListingListAdapter(listings)
 
 		private var disposable: DisposableSingleObserver<List<SearchListing>>? = null
 
-		@BindView(R.id.loading_indicator)
-		lateinit var loadingIndicator: ProgressBar
-		@BindView(R.id.heading)
-		lateinit var headingTextView: TextView
-		@BindView(R.id.listings_recycler_view)
-		lateinit var listingRecyclerView: RecyclerView
-
 		init {
-			ButterKnife.bind(this, view)
-
-			adapter = ListingListAdapter(listings)
 			adapter.listener = this@CategoryListAdapter
-			listingRecyclerView.layoutManager = LinearLayoutManager(view.context, LinearLayoutManager.HORIZONTAL, false)
-			listingRecyclerView.adapter = adapter
+			binding.listingsRecyclerView.layoutManager = LinearLayoutManager(binding.root.context, LinearLayoutManager.HORIZONTAL, false)
+			binding.listingsRecyclerView.adapter = adapter
+
+			binding.heading.setOnClickListener{
+				listener?.onCategorySelected(category.id)
+			}
 		}
 
 		fun bind(category: Category) {
@@ -153,12 +142,12 @@ class CategoryListAdapter(private val categories: List<Category>) :
 
 		private fun updateView() {
 			// disable touch events for leaf categories to prevent navigation
-			headingTextView.isEnabled = getHasSubcategories()
+			binding.heading.isEnabled = getHasSubcategories()
 
-			headingTextView.text = getCategoryName()
+			binding.heading.text = getCategoryName()
 
-			loadingIndicator.visibility = if (getLoadingIndicatorVisible()) View.VISIBLE else View.GONE
-			listingRecyclerView.visibility = if (getListingsVisible()) View.VISIBLE else View.GONE
+			binding.loadingIndicator.visibility = if (getLoadingIndicatorVisible()) View.VISIBLE else View.GONE
+			binding.listingsRecyclerView.visibility = if (getListingsVisible()) View.VISIBLE else View.GONE
 		}
 
 		private fun getHasSubcategories(): Boolean {
@@ -177,15 +166,6 @@ class CategoryListAdapter(private val categories: List<Category>) :
 		private fun getListingsVisible(): Boolean {
 			// only show the listings if they have loaded
 			return disposable == null
-		}
-
-		/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		 * ui listeners
-		 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-		@OnClick(R.id.heading)
-		fun onCategorySelected() {
-			listener?.onCategorySelected(category.id)
 		}
 	}
 }

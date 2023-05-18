@@ -46,14 +46,13 @@ open class CategoriesRepository(
 
 					val targetCategory = getSubcategory(number, category)
 
-					@Suppress("FoldInitializerAndIfToElvis")
-					if (targetCategory == null) {
-						// todo this case should not be possible, report it to analytics to get visibility on the issue
-						// todo what are TradeMe's best practices for handling exceptional cases / errors?
-						throw IllegalStateException("Failed to find Category with number: $number")
+					if (targetCategory != null) {
+						return@map targetCategory
 					}
 
-					targetCategory
+					// todo this case should not be possible, report it to analytics to get visibility on the issue
+					// todo what are TradeMe's best practices for handling exceptional cases / errors?
+					throw IllegalStateException("Failed to find Category with number: $number")
 				}
 	}
 

@@ -5,18 +5,14 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
-import android.widget.ImageView
-import android.widget.ProgressBar
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import butterknife.BindView
-import butterknife.ButterKnife
 import com.bumptech.glide.Glide
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.observers.DisposableSingleObserver
 import io.reactivex.schedulers.Schedulers
 import nz.co.trademe.techtest.R
 import nz.co.trademe.techtest.core.TMApplication
+import nz.co.trademe.techtest.databinding.ActivityListingBinding
 import nz.co.trademe.techtest.domain.repository.ListingsRepository
 import nz.co.trademe.techtest.ui.util.ErrorDialogUtil
 import nz.co.trademe.wrapper.models.ListedItemDetail
@@ -42,23 +38,13 @@ class ListingActivity : AppCompatActivity() {
 	private var listingId: Long = INVALID_LISTING_ID
 	private var listing: ListedItemDetail? = null
 
-	@BindView(R.id.loading_indicator)
-	lateinit var loadingIndicator: ProgressBar
-	@BindView(R.id.photo)
-	lateinit var photoImageView: ImageView
-	@BindView(R.id.heading)
-	lateinit var headingTextView: TextView
-	@BindView(R.id.price)
-	lateinit var priceTextView: TextView
-	@BindView(R.id.listing_number)
-	lateinit var listingNumberTextView: TextView
-
+	private lateinit var binding: ActivityListingBinding
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		setContentView(R.layout.activity_listing)
 
-		ButterKnife.bind(this)
+		binding = ActivityListingBinding.inflate(layoutInflater)
+		setContentView(binding.root)
 
 		// display up navigation arrow
 		supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -72,7 +58,7 @@ class ListingActivity : AppCompatActivity() {
 
 	override fun onOptionsItemSelected(item: MenuItem): Boolean {
 		if (item.itemId == android.R.id.home) {
-			onBackPressed()
+			onBackPressedDispatcher.onBackPressed()
 			return true
 		}
 
@@ -84,22 +70,24 @@ class ListingActivity : AppCompatActivity() {
 	 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 	private fun updateView() {
-		loadingIndicator.visibility = if (getLoadingIndicatorVisible()) View.VISIBLE else View.GONE
+		with(binding){
+			loadingIndicator.visibility = if (getLoadingIndicatorVisible()) View.VISIBLE else View.GONE
 
-		val contentVisible = getContentVisible()
-		photoImageView.visibility = if (contentVisible) View.VISIBLE else View.GONE
-		headingTextView.visibility = if (contentVisible) View.VISIBLE else View.GONE
-		priceTextView.visibility = if (contentVisible) View.VISIBLE else View.GONE
-		listingNumberTextView.visibility = if (contentVisible) View.VISIBLE else View.GONE
-		if (contentVisible) {
-			Glide.with(photoImageView.context)
+			val contentVisible = getContentVisible()
+			photo.visibility = if (contentVisible) View.VISIBLE else View.GONE
+			heading.visibility = if (contentVisible) View.VISIBLE else View.GONE
+			price.visibility = if (contentVisible) View.VISIBLE else View.GONE
+			listingNumber.visibility = if (contentVisible) View.VISIBLE else View.GONE
+			if (contentVisible) {
+				Glide.with(photo.context)
 					.load(getPhotoUrl())
 					.centerCrop()
 					.placeholder(R.drawable.ic_listing_default)
-					.into(photoImageView)
-			headingTextView.text = getTitleText()
-			priceTextView.text = getDisplayPrice()
-			listingNumberTextView.text = getListingNumberText()
+					.into(photo)
+				heading.text = getTitleText()
+				price.text = getDisplayPrice()
+				listingNumber.text = getListingNumberText()
+			}
 		}
 	}
 
@@ -127,7 +115,7 @@ class ListingActivity : AppCompatActivity() {
 		return listing?.priceDisplay
 	}
 
-	private fun getListingNumberText(): String? {
+	private fun getListingNumberText(): String {
 		return getString(R.string.listing_number_, listing?.listingId)
 	}
 
@@ -163,7 +151,7 @@ class ListingActivity : AppCompatActivity() {
 								e,
 								onCancel = {
 									// back out of the screen if the user cancels as the screen is unusable
-									onBackPressed()
+									onBackPressedDispatcher.onBackPressed()
 								},
 								onRetry = {
 									// retry the request

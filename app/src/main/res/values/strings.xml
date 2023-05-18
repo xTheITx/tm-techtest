@@ -11,17 +11,17 @@
     <string name="loading_message_4">The rotation of earth really makes my day</string>
     <string name="loading_message_5">How does a penguin build it\'s house?\n\n\n\n\nIgloos it together</string>
     <string name="loading_message_6">What\'s orange and sounds like a parrot?\n\n\n\n\nA carrot.</string>
-    <string name="loading_message_7">They say that people that work at TradeMe are pretty awesome ;)</string>
+    <string name="loading_message_7">They say that people that work at Itty Bitty Apps are pretty awesome ;)</string>
 
     <!-- category listing preview -->
     <string name="cd_listing_image_preview">Listing image preview</string>
 
     <!-- listing -->
-    <string name="listing_number_">Listing #: %s</string>
+    <string name="listing_number_">Listing #: %d</string>
     <string name="cd_listing_image">Listing image</string>
 
     <!-- error messages-->
-    <string name="network_error_message">An network error has occured, check your connection and try again</string>
-    <string name="unknown_error_message">An unknown error has occured, we have been informed of the issue</string>
+    <string name="network_error_message">An network error has occurred, check your connection and try again</string>
+    <string name="unknown_error_message">An unknown error has occurred, we have been informed of the issue</string>
 
 </resources>
